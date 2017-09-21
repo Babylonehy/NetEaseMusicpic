@@ -15,10 +15,22 @@ import sys
 import math
 
 #进度条
-def view_bar(cur, total):
+def view_bar(cur, total,time_start):
     percent = '{:.2%}'.format(cur / total)  
     sys.stdout.write('\r')  
-    sys.stdout.write('抓取进度:'+'[%-50s] %s'% ( '=' * int(math.floor(cur * 50 /total)),percent))
+    speed=((time.time()-time_start)/cur)
+    remindtime=(total-cur)*speed
+    if int(remindtime)<60:
+        sys.stdout.write('抓取进度:'+str(cur)+'/'+str(total)+'[%-50s] %s'% ( '>' * int(math.floor(cur * 50 /total)),percent)+'剩余时间:%.2f S'%(remindtime))
+    elif int(remindtime) < 3600:
+        m=int(remindtime/60.0)
+        s=remindtime-60*m
+        sys.stdout.write('抓取进度:'+str(cur)+'/'+str(total)+'[%-50s] %s'% ( '>' * int(math.floor(cur * 50 /total)),percent)+'剩余时间:'+str(m)+'m%.2f'%(s))
+    elif  int(remindtime) > 3600:
+        h=int(remindtime/3600.0)
+        m=int((remindtime-3600*h)/60)
+        s=remindtime-60*m-3600*h
+        sys.stdout.write('抓取进度:'+str(cur)+'/'+str(total)+'[%-50s] %s'% ( '>' * int(math.floor(cur * 50 /total)),percent)+'剩余时间:'+str(h)+'h'+str(int(m))+'m%.2f'%(s)+'s')
     sys.stdout.flush()  
     if cur == total:  
         sys.stdout.write('\n')  
@@ -45,7 +57,7 @@ for i in range(totalmusic):        # 遍历
     urllib.request.urlretrieve(link,'/Users/lixiang/Desktop/网易云抓取/'+name)        # 提前要创建文件夹，在此文件目录下创建“网易云音乐”文件夹
     total=total+1
     table.add_row([i+1,arr['result']['tracks'][i]['name'],arr['result']['tracks'][i]['artists'][0]['name'],]) 
-    view_bar(total, totalmusic)
+    view_bar(total, totalmusic,time_start)
     #print(str(100*(total/totalmusic))+'%')  
 print (table)
 #显示爬虫历时
